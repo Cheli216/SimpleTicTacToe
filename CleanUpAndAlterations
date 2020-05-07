@@ -1,0 +1,374 @@
+// ****** TicTacToe Class*****
+package fp;
+
+import java.util.ArrayList;
+import java.util.Scanner;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class TicTacToeGame extends JFrame implements ActionListener {
+
+private char[][] symbols; // X AND O SYMBOLS
+private JPanel board; // BOARD LAYOUT
+private JLabel announcement; // DISPLAY MESSAGES TO THE NORTH BORDER LAYOUT
+private JButton[][] buttons; // 2DIMENSIOARRAY BUTTONS THAT PLAYERS CLICK ON
+private boolean turnX; // BOOLEAN TO TAKE TURNS AFTER A PLAYER CLICKS ON THEIR BOX
+private static ArrayList<Users> user = new ArrayList<Users>();
+private static String fName;
+private static String fName2;
+private static int score = 0;
+Users player1 = new Users(fName, score);
+Users player2 = new Users(fName2, score);
+
+
+public TicTacToeGame() {
+
+	super("Tic-Tac-Toe Game");// SUPER IMPLEMENTED TO TIE EVERYTHING TOGETHER 
+								// GAME NAME shows on top of the gameboard
+
+	this.setLayout(new BorderLayout());
+	this.setSize(900, 900);
+	setDefaultCloseOperation(EXIT_ON_CLOSE);
+	JOptionPane.showMessageDialog(null, " --WELCOME TO THE TIC TAC TOE GAME-- "); // SHOWS BEGINNING POP UP MESSAGE
+	fName = JOptionPane.showInputDialog(null, " PLAYER 1 FIRST NAME \n", fName, JOptionPane.OK_CANCEL_OPTION); // allows FIRST NAME to be added
+	player1.setFirstName(fName);
+	System.out.println(player1.getFirstName());
+	player1.setScore(0);
+	System.out.println(player1.getScore());
+	user.add(player1); // Adding player1 info
+	
+	fName2 = JOptionPane.showInputDialog(null, " PLAYER 2 FIRST NAME \n", fName2, JOptionPane.OK_CANCEL_OPTION); // allows FIRST NAME to be added
+	player2.setFirstName(fName2);
+	System.out.println(player2.getFirstName());
+	player2.setScore(0);
+	System.out.println(player2.getScore());
+	user.add(player2); // Adding player2 info
+	
+	System.out.println("Player 1 is " + player1.toString());
+	System.out.println("Player 2 is " + player2.toString());
+	
+
+	announcement = new JLabel(" Final Program Project - Tic Tac Toe Game " + "  **** PLAYER 1: "
+			+ player1.toString() + "  PLAYER 2: " + player2.toString() + ". PLAYER 1 STARTS THE GAME!"); // BEGINNING HEADER MESSAGE
+
+	announcement.setVisible(true); // SET TO TRUE TO BE ABLE TO LET THE PLAYER VIEW THE ANNOUCEMENT.
+	this.add(announcement, BorderLayout.NORTH);// DISPLAYS ON NORTH BORDER AS STATED IN THE PROJECT DETAIL.
+	
+	board = new JPanel(new GridLayout(3, 3)); // 3x3 GRIDLAYOUT FOR THE BOARD GAME. TOTAL OF 9 BOXES
+	board.setVisible(true);
+	buttons = new JButton[3][3]; // ARRAYS TO SET FOR 3x3 BOX LAYOUT
+	symbols = new char[3][3]; // CHAR SETTING OF X'S AND O'S AFTER CLICKING ON THE BOX.
+	for (int i = 0; i < 3; i++) { // FOR LOOP TO LINK BUTTONS, EMPTY BOX, AND APPROPRIATE X AND O SYMBOL
+									// DISPLAYS.
+		for (int j = 0; j < 3; j++) {
+			buttons[i][j] = new JButton(" ");
+			buttons[i][j].setEnabled(true);
+			buttons[i][j].addActionListener(this);
+			buttons[i][j].setActionCommand(i + " " + j);
+			buttons[i][j].setVisible(true);
+			board.add(buttons[i][j]);
+			symbols[i][j] = '.';
+
+		}
+		this.add(board, BorderLayout.CENTER); // A CENTER BORDER LAYOUT AS DESCRIBED IN PROGRAMMING DETAILED.
+		turnX = true;
+	}
+}
+
+private boolean won(char playerMark, char[][] board) { // BOOLEAN TO KEEP TRACK OF 3 IN A ROW TO DISPLAY WINNER.
+	for (int row = 0; row < 3; row++) {
+		int count = 0;
+		for (int col = 0; col < 3; col++) {
+			if (board[row][col] == playerMark)
+				count++;
+			else
+				count = 0;
+		}
+
+		if (count == 3)
+			return true;
+	}
+
+	for (int col = 0; col < 3; col++) {
+		int count = 0;
+		for (int row = 0; row < 3; row++) {
+			if (board[row][col] == playerMark)
+				count++;
+			else
+				count = 0;
+		}
+
+		if (count == 3)
+			return true;
+	}
+	if (board[1][1] == playerMark && board[0][0] == playerMark && board[2][2] == playerMark)
+		return true;
+
+	if (board[1][1] == playerMark && board[0][2] == playerMark && board[2][0] == playerMark)
+		return true;
+	return false;
+}
+
+private boolean tie(char[][] board) { // BOOLEAN TO KEEP TRACK IF THERE ARE NO 3 MATCHING SYMBOLS AND DISPLAYS A TIE
+										// GAME.
+
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			if (board[i][j] == '.')
+				return false;
+		}
+	}
+
+	return true;
+}
+
+public void actionPerformed(ActionEvent e) { // ACTION PERFORMED METHOD
+
+	String a = e.getActionCommand();
+	if (a.length() == 3) {
+
+		Scanner input = new Scanner(a);
+		String rowString = input.next();
+		String colString = input.next();
+
+		int row = Integer.parseInt(rowString);
+		int col = Integer.parseInt(colString);
+
+		JButton button = buttons[row][col];
+
+		if (button.isEnabled()) {
+			if (turnX) {// DISPLAY TO SHOW
+				announcement.setText("**** IT IS " + player1.getFirstName() + "'S TURN!!! ****"); // PLAYER'S O TURN TO CLICK ON AN EMPTY BOX
+																								 
+			
+																								
+				button.setText("X");
+				button.setBackground(Color.WHITE);
+				symbols[row][col] = 'X';
+				button.setFont(button.getFont().deriveFont(100.0f)); // INCREASING THE SIZE OF THE CHAR
+				button.setEnabled(false);
+				turnX = false;
+			} else {
+				announcement.setText("**** IT IS " + player2.getFirstName() + "'S TURN!!! ****"); // DISPLAY TO SHOW
+				// PLAYER'S X TURN TO
+				// CLICK ON AN EMPTY BOX
+				button.setText("O");
+				button.setBackground(Color.WHITE);
+				symbols[row][col] = 'O';
+				button.setFont(button.getFont().deriveFont(100.0f)); // INCREASING THE SIZE OF THE CHAR
+				button.setEnabled(false);
+				turnX = true;
+			}
+		}
+		if (tie(symbols)) { // DISPLAYS IF NOBODY GETS THE SAME SYMBOLS FOR 3 IN A ROW
+			announcement.setText("****  --WELCOME TO THE TIC TAC TOE GAME--  ****");
+			for (int i = 0; i < 3; i++)
+				for (int j = 0; j < 3; j++)
+					buttons[i][j].setEnabled(false);
+			JOptionPane.showMessageDialog(null, "The game was tie!");// SHOWS POP UP MESSAGE
+			int answer = JOptionPane.showConfirmDialog(null, "", "Do you want to start a new game",
+					JOptionPane.YES_NO_OPTION);// OPTION TO CHOOSE
+			if (answer == JOptionPane.YES_OPTION) { // if yes it will reload the whole game into a new window
+				this.clearIt(e);
+			} else if (answer == JOptionPane.NO_OPTION) { // if no it will end the program
+				System.exit(0);
+			}
+		}
+		if (won('X', symbols)) { // DISPLAY IF X HAS 3 SAME SYMBOLS IN A ROW
+			announcement.setText("****   --WELCOME TO THE TIC TAC TOE GAME--  ****");
+			int player1CurrentScore = player1.getScore();
+			player1.setScore(player1CurrentScore = player1CurrentScore +1);
+			
+			
+			for (int i = 0; i < 3; i++)
+				for (int j = 0; j < 3; j++)
+					buttons[i][j].setEnabled(false);
+			JOptionPane.showMessageDialog(null, "PLAYER1: " + player1.getFirstName() + " WINS!");// SHOWS POP UP MESSAGE
+			int answer = JOptionPane.showConfirmDialog(null, "Do you want to start a new game?\n", "",
+					JOptionPane.YES_NO_OPTION);// OPTION TO CHOOSE
+
+			if (answer == JOptionPane.YES_OPTION) { // if yes it will reload the whole game into a new window
+
+				this.clearIt(e);
+			} else if (answer == JOptionPane.NO_OPTION) { // if no it will end the program
+				System.exit(0);
+			}
+
+		}
+
+		if (won('O', symbols)) { // DISPLAY IF O HAS 3 SAME SYMBOLS IN A ROW
+			announcement.setText("****  --WELCOME TO THE TIC TAC TOE GAME--  ****");
+			
+			player2.setScore(score++);
+			
+			for (int i = 0; i < 3; i++)
+				for (int j = 0; j < 3; j++)
+					buttons[i][j].setEnabled(false);
+			JOptionPane.showMessageDialog(null, "PLAYER2: " + player2.getFirstName() + " WINS!"); // SHOWS POP UP MESSAGE
+			int answer = JOptionPane.showConfirmDialog(null, "Do you want to start a new game?\n", "",
+					JOptionPane.YES_NO_OPTION); // OPTION TO CHOOSE
+
+			if (answer == JOptionPane.YES_OPTION) { // if yes it will reload the whole game into a new window
+				this.clearIt(e);
+			} else if (answer == JOptionPane.NO_OPTION) { // if no it will end the program
+				System.exit(0);
+			}
+
+		}
+		input.close(); // CLOSING THE STREAM INPUT
+
+	}
+}
+
+public void clearIt(ActionEvent e) {
+
+	for (int i = 0; i < 3; i++) {
+
+		for (int j = 0; j < 3; j++)
+			symbols[i][j] = ('.');
+
+	}
+	for (int i = 0; i < 3; i++) {
+
+		for (int j = 0; j < 3; j++)
+			buttons[i][j].setText(" ");
+
+	}
+
+	for (int i = 0; i < 3; i++) {
+
+		for (int j = 0; j < 3; j++)
+			buttons[i][j].setEnabled(true);
+	}
+	turnX = true;
+
+}}
+
+
+//***** Users Class **********
+package fp;
+
+public class Users {
+	private String firstName;
+	private int score;
+	
+	public Users(String userFirstName, int userScore) {
+		this.firstName = userFirstName;
+		this.score = userScore;
+		getFirstName();
+		setFirstName(firstName);
+		getScore();
+		setScore(score);
+		
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String name) {
+		firstName = name;
+	}
+
+	public int getScore() {
+		return score;
+	}
+
+	public void setScore(int setScore) {
+		score = setScore;
+	}
+
+	@Override
+	public String toString() {
+		return "User: " + firstName + " Current Score: "+ score;
+	}
+	
+}
+
+//************** TrackingFile class (renamed stats class)******
+package fp;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class TrackingFile{
+	private static ArrayList<Users> userList = new ArrayList<Users>();
+	String currentDirectoryLocation = System.getProperty("user.dir");
+	File currentDirectory = new File(currentDirectoryLocation);
+	private Scanner userAccessFile;
+	private FileOutputStream userFile;
+
+	public TrackingFile() {
+		accessFile();
+		scanUserList();
+		searchCurrentUser(null);
+		saveUserFile();
+	}
+	public void accessFile() {
+			userAccessFile = new Scanner((Readable) userFile);
+			scanUserList();
+			userAccessFile.close();
+	}
+	public void scanUserList() {
+		while(userAccessFile.hasNextLine()) {
+			String userLine = userAccessFile.nextLine();
+			String[] userLineContents = userLine.split(",");
+			String userName = userLineContents[0];
+			Integer userScore = Integer.parseInt(userLineContents[1]);
+			Users user = new Users(userName, userScore);
+			userList.add(user);
+			
+		}
+	}
+	public void searchCurrentUser(Users player) {
+		int score;
+		for(Users user : userList) {
+			if(user.getFirstName().equalsIgnoreCase(player.getFirstName())) {
+				score = player.getScore();
+			} else {
+				score = 0;
+			}
+		}
+	}
+	public void saveUserFile() {
+		PrintWriter userFilePW;
+		try {
+			userFilePW = new PrintWriter(new FileOutputStream("scoreBoard.csv"));
+			userFilePW.print(userList);
+			
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+}
+
+//**** Driver Class ******
+package fp;
+
+public class Driver {
+
+public static void main(String args[])
+{
+	TicTacToeGame tictac = new TicTacToeGame();
+	tictac.setVisible(true);
+	
+	
+}
+}
+
